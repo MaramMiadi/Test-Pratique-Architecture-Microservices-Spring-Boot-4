@@ -1,0 +1,87 @@
+services:
+  postgres-produits:
+    image: postgres:16-alpine
+    container_name: postgres-produits
+    environment:
+      POSTGRES_DB: produitsdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+  postgres-avis:
+    image: postgres:16-alpine
+    container_name: postgres-avis
+    environment:
+      POSTGRES_DB: avisdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  eureka-server:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_MAIN_ALLOW-BEAN-DEFINITION-OVERRIDING=true
+
+  produits-service:
+    build:
+      context: .
+      dockerfile: produits-service/Dockerfile
+    container_name: produits-service
+    ports:
+      - "8091:8091"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-produits:5432/produitsdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATA_REDIS_HOST=redis
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_MAIN_ALLOW-BEAN-DEFINITION-OVERRIDING=true
+    depends_on:
+      - postgres-produits
+      - redis
+      - eureka-server
+
+  avis-service:
+    build:
+      context: .
+      dockerfile: avis-service/Dockerfile
+    container_name: avis-service
+    ports:
+      - "8092:8092"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-avis:5432/avisdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_MAIN_ALLOW-BEAN-DEFINITION-OVERRIDING=true
+    depends_on:
+      - postgres-avis
+      - eureka-server
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8090:8090"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_MAIN_ALLOW-BEAN-DEFINITION-OVERRIDING=true
+    depends_on:
+      - eureka-server
+      - produits-service
+      - avis-service
