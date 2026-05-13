@@ -1,0 +1,6 @@
+com\formation\avisservice\Feignclient\ProduitClient.class
+com\formation\avisservice\Repository\AvisRepository.class
+com\formation\avisservice\Controller\AvisController.class
+com\formation\avisservice\entity\Avis.class
+com\formation\avisservice\AvisServiceApplication.class
+com\formation\avisservice\service\AvisService.class

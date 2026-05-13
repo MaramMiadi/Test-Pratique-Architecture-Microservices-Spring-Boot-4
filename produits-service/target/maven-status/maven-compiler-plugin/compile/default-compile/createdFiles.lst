@@ -1,0 +1,8 @@
+com\formation\produitsservice\service\ProduitService.class
+com\formation\produitsservice\controller\CategorieController.class
+com\formation\produitsservice\controller\ProduitController.class
+com\formation\produitsservice\entity\Categorie.class
+com\formation\produitsservice\repository\ProduitRepository.class
+com\formation\produitsservice\repository\CategorieRepository.class
+com\formation\produitsservice\entity\Produit.class
+com\formation\produitsservice\ProduitsServiceApplication.class
